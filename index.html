@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>曼谷通 — 城市漫遊 2026</title>
+
+<!-- ═══ PWA ════════════════════════════════════════════════ -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#C8960C">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="曼谷通">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+<meta name="description" content="Shane & Friends 曼谷城市漫遊 2026 — 5/28–6/2 六天完整行程">
+<meta property="og:title" content="曼谷通 — 城市漫遊 2026">
+<meta property="og:description" content="六天完整行程 · 美食 · 購物 · 古蹟 · SPA">
+<!-- ═══════════════════════════════════════════════════════ -->
+
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --cream: #FFFDF5;
+  --gold: #C8A96E;
+  --gold-dark: #735C00;
+  --gold-light: #F5ECC8;
+  --gold-border: #E8D99A;
+  --text: #1C1C19;
+  --text-muted: #735C00;
+  --white: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --bg-tip: #FFFBEA;
+  --font-serif: 'Noto Serif TC', serif;
+  --font-sans: 'Noto Sans TC', sans-serif;
+}
+
+html { background: var(--cream); scroll-behavior: smooth; }
+body { font-family: var(--font-sans); color: var(--text); background: var(--cream); min-height: 100vh; }
+
+/* ── STICKY TOP NAV ──────────────────────────── */
+.top-nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,253,245,0.96);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--gold-border);
+  padding: 10px 16px 0;
+}
+.nav-brand {
+  display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px;
+}
+.nav-brand .vol { font-family: monospace; font-size: 10px; color: #A08030; letter-spacing: 0.2em; }
+.nav-brand .title { font-family: var(--font-serif); font-size: 18px; font-weight: 900; color: var(--text); }
+.nav-brand .sub { font-family: var(--font-serif); font-size: 12px; color: var(--gold-dark); font-style: italic; }
+
+/* Day tabs - horizontal scroll */
+.day-tabs {
+  display: flex; gap: 6px; overflow-x: auto; padding-bottom: 10px;
+  scrollbar-width: none; -ms-overflow-style: none;
+}
+.day-tabs::-webkit-scrollbar { display: none; }
+.day-tab {
+  flex-shrink: 0; padding: 8px 14px;
+  border: 1.5px solid var(--gold-border);
+  border-radius: 20px; cursor: pointer;
+  background: var(--white); transition: all 0.2s;
+  display: flex; flex-direction: column; align-items: center; gap: 1px;
+}
+.day-tab.active {
+  background: var(--gold-dark); border-color: var(--gold-dark);
+}
+.day-tab .tab-day {
+  font-family: monospace; font-size: 9px; letter-spacing: 0.1em;
+  color: #A08030; font-weight: 600;
+}
+.day-tab.active .tab-day { color: var(--gold-light); }
+.day-tab .tab-label {
+  font-family: var(--font-serif); font-size: 12px; font-weight: 700;
+  color: var(--text); white-space: nowrap;
+}
+.day-tab.active .tab-label { color: #FFFDF5; }
+
+/* ── PAGES ───────────────────────────────────── */
+.page { display: none; }
+.page.active { display: block; animation: fadeUp 0.3s ease both; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── HERO PHOTO + TITLE ──────────────────────── */
+.day-hero { position: relative; height: 220px; overflow: hidden; }
+.day-hero img {
+  width: 100%; height: 100%; object-fit: cover;
+  filter: brightness(0.75);
+}
+.day-hero-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(transparent 20%, rgba(0,0,0,0.75) 100%);
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 16px;
+}
+.hero-day-label {
+  font-family: monospace; font-size: 11px; letter-spacing: 0.2em;
+  font-weight: 600; margin-bottom: 4px;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+}
+.hero-title {
+  font-family: var(--font-serif); font-size: 28px; font-weight: 900;
+  color: #F5ECC8; line-height: 1.1; margin-bottom: 4px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.9);
+}
+.hero-subtitle {
+  font-family: monospace; font-size: 11px; color: rgba(245,236,200,0.85);
+  letter-spacing: 0.08em; text-shadow: 0 1px 4px rgba(0,0,0,0.7);
+}
+
+/* ── NOTE BANNER ──────────────── */
+.note-banner {
+  margin: 12px 16px 0;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border-left: 4px solid var(--gold);
+  background: #FFF8E1;
+}
+.note-banner .note-title {
+  font-family: var(--font-serif); font-size: 14px; font-weight: 700;
+  color: var(--text); margin-bottom: 4px;
+}
+.note-banner .note-desc {
+  font-size: 13px; color: var(--text); line-height: 1.6;
+}
+
+/* ── SECTION LABEL ───────────────────────────── */
+.section-label {
+  margin: 16px 16px 8px;
+  font-family: monospace; font-size: 10px; letter-spacing: 0.2em;
+  color: #A08030; font-weight: 600;
+  border-bottom: 1px solid var(--gold-border); padding-bottom: 6px;
+}
+
+/* ── SCHEDULE ITEMS ──────────────────────────── */
+.schedule { margin: 0 16px; }
+.sched-item {
+  border-left: 2px solid var(--gold-border);
+  padding-left: 16px; position: relative;
+  margin-bottom: 2px;
+}
+.sched-dot {
+  position: absolute; left: -5px; top: 18px;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--gold); border: 2px solid var(--cream);
+  transition: background 0.2s;
+}
+.sched-header {
+  padding: 14px 0 12px;
+  border-bottom: 1px solid #F0E6B0;
+  cursor: pointer;
+}
+.sched-header:active { background: #FFFBEA; }
+.sched-time {
+  font-family: monospace; font-size: 12px; font-weight: 600;
+  color: var(--gold-dark); margin-bottom: 4px; letter-spacing: 0.05em;
+}
+.sched-title {
+  font-family: var(--font-serif); font-size: 16px; font-weight: 700;
+  color: var(--text); line-height: 1.35; margin-bottom: 6px;
+}
+.sched-meta {
+  display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+}
+.map-btn {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-family: monospace; font-size: 10px; font-weight: 600;
+  color: var(--gold-dark); border: 1.5px solid var(--gold);
+  padding: 4px 10px; border-radius: 4px; text-decoration: none;
+  background: transparent; letter-spacing: 0.05em;
+}
+.tag {
+  font-family: monospace; font-size: 10px;
+  color: var(--gold-dark); border: 1px solid var(--gold-border);
+  padding: 3px 8px; border-radius: 3px; background: #FFFBEA;
+}
+.sched-body {
+  padding: 10px 0 14px;
+  display: none;
+}
+.sched-body.open { display: block; }
+.sched-desc {
+  font-size: 13px; color: var(--text); line-height: 1.75;
+  white-space: pre-line; margin-bottom: 8px;
+}
+.editorial-note {
+  background: #FFF8D6; border-left: 3px solid var(--gold);
+  padding: 10px 12px; border-radius: 0 6px 6px 0; margin-top: 8px;
+}
+.editorial-label {
+  font-family: monospace; font-size: 10px; letter-spacing: 0.15em;
+  font-weight: 600; margin-bottom: 5px;
+}
+.editorial-text {
+  font-size: 12px; color: var(--text); line-height: 1.7;
+  font-style: italic;
+}
+
+/* ── TIPS BLOCK ──────────────────────────────── */
+.tips-block {
+  margin: 12px 16px;
+  background: var(--bg-tip);
+  border: 1px solid var(--gold-border);
+  border-top-width: 2px;
+  border-radius: 6px;
+  padding: 14px;
+}
+.tips-label {
+  font-family: monospace; font-size: 11px; letter-spacing: 0.15em;
+  font-weight: 700; margin-bottom: 10px;
+}
+.tip-row {
+  display: flex; gap: 8px; margin-bottom: 7px;
+  font-size: 13px; color: var(--text); line-height: 1.6;
+}
+.tip-arrow { flex-shrink: 0; }
+
+/* ── TODAY INFO ───────────────── */
+.today-info {
+  margin: 0 16px 16px;
+  background: var(--white);
+  border: 1px solid var(--gold-border);
+  border-top-width: 2px;
+  border-radius: 6px;
+  padding: 14px;
+}
+.today-info-label {
+  font-family: monospace; font-size: 11px; letter-spacing: 0.15em;
+  font-weight: 700; margin-bottom: 12px;
+}
+.info-item {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 10px 0; border-bottom: 1px solid #F0E6B0;
+}
+.info-item:last-child { border-bottom: none; padding-bottom: 0; }
+.info-icon { font-size: 20px; flex-shrink: 0; line-height: 1.3; }
+.info-content { flex: 1; min-width: 0; }
+.info-label {
+  font-family: var(--font-serif); font-size: 14px; font-weight: 700;
+  color: var(--text); margin-bottom: 3px;
+}
+.info-detail {
+  font-size: 12px; color: var(--text); line-height: 1.65;
+}
+.info-map {
+  display: inline-flex; align-items: center; gap: 2px;
+  font-family: monospace; font-size: 10px; font-weight: 600;
+  color: var(--gold-dark); border: 1.5px solid var(--gold);
+  padding: 4px 8px; border-radius: 4px; text-decoration: none;
+  flex-shrink: 0; margin-top: 2px;
+}
+
+/* ── PHOTO GRID ──────────────── */
+.photo-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 3px;
+  margin: 12px 16px 0; height: 160px;
+}
+.photo-grid .photo-main { grid-row: 1 / 3; height: 100%; }
+.photo-tile {
+  overflow: hidden; position: relative; border-radius: 4px; background: #E8D99A;
+}
+.photo-tile img {
+  width: 100%; height: 100%; object-fit: cover;
+  display: block; filter: brightness(0.88);
+}
+.photo-tile .photo-cap {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: linear-gradient(transparent, rgba(0,0,0,0.65));
+  padding: 10px 7px 5px;
+  font-family: monospace; font-size: 8px; letter-spacing: 0.1em;
+  color: rgba(245,236,200,0.9);
+}
+.photo-grid .photo-col { display: flex; flex-direction: column; gap: 3px; }
+.photo-col .photo-tile { flex: 1; }
+
+/* ── SPACER ─────────────────────────────────── */
+.day-spacer { height: 24px; }
+
+/* ── CHEVRON ─────────────────────────────────── */
+.chevron {
+  display: inline-block; width: 16px; height: 16px;
+  position: relative; margin-left: auto; flex-shrink: 0;
+}
+.chevron::before, .chevron::after {
+  content: ''; position: absolute; width: 7px; height: 1.5px;
+  background: var(--gold-dark); border-radius: 2px; top: 7px;
+}
+.chevron::before { left: 1px; transform: rotate(45deg); }
+.chevron::after  { left: 6px; transform: rotate(-45deg); }
+.chevron.open::before { transform: rotate(-45deg); }
+.chevron.open::after  { transform: rotate(45deg); }
+
+/* ── BOTTOM PADDING for iOS home bar ─────────── */
+.bottom-pad { height: env(safe-area-inset-bottom, 20px); min-height: 20px; }
+
+/* ── PWA Install Banner ───────────────────────── */
+#install-banner {
+  display: none;
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+  background: #3C1400; color: #FFD700;
+  padding: 12px 16px; padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  font-family: var(--font-sans); font-size: 13px;
+  border-top: 2px solid #C8960C;
+  display: flex; align-items: center; gap: 10px;
+}
+#install-banner.show { display: flex; }
+#install-banner .install-text { flex: 1; line-height: 1.4; }
+#install-banner button {
+  background: #C8960C; color: #fff; border: none;
+  padding: 8px 14px; border-radius: 6px; font-size: 12px;
+  font-weight: 700; cursor: pointer; white-space: nowrap;
+}
+#install-banner .dismiss {
+  background: transparent; color: #C8960C; padding: 8px;
+  font-size: 18px; line-height: 1;
+}
+</style>
+</head>
+<body>
+
+<!-- PWA Install Banner -->
+<div id="install-banner">
+  <div class="install-text">📱 加入主畫面，像 App 一樣使用！</div>
+  <button id="install-btn">安裝</button>
+  <button class="dismiss" id="dismiss-btn">✕</button>
+</div>
+
+<!-- TOP NAV -->
+<div class="top-nav">
+  <div class="nav-brand">
+    <span class="vol">VOL.2026</span>
+    <span class="title">BANGKOK</span>
+    <span class="sub">城市漫遊 · 手機版</span>
+  </div>
+  <div class="day-tabs" id="dayTabs"></div>
+</div>
+
+<!-- PAGES -->
+<div id="pages"></div>
+<div class="bottom-pad"></div>
+
+<script>
+// ── PWA Install Prompt ──────────────────────────
+let deferredPrompt;
+const banner = document.getElementById('install-banner');
+const installBtn = document.getElementById('install-btn');
+const dismissBtn = document.getElementById('dismiss-btn');
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  banner.classList.add('show');
+});
+
+installBtn?.addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  banner.classList.remove('show');
+});
+
+dismissBtn?.addEventListener('click', () => {
+  banner.classList.remove('show');
+});
+
+// Hide banner if already installed
+window.addEventListener('appinstalled', () => {
+  banner.classList.remove('show');
+});
+
+// ── DATA ────────────────────────────────────────
+const DAY_PHOTOS = [
+  [
+    { url: "https://lh3.googleusercontent.com/aida-public/AB6AXuCkYAyyVlWLfz7ZIYYp60SL_8QW4U_NQ656FPtl1wOmHRExfg3x_RKMhI5BuDjDrWJJ2kYw43RfsInWoRjsNnf5URoYCPn_lOoM5EdqpbwWbpC-w5LeUAhCFaabGfM8gpJE3l8X1b62sXriQ8_ngY57T5D3FDY35ePV0ikxBhKYaE7J4L13INFo28kJyOAGXSuIiX3-sVq3puj-sAW9IcHMtCbS3UkXA9dmCLs8W78UybPgH8Q8tCA5ZE5tACNtx0PlMf5z-SgMQWoA", cap: "BKK Airport" },
+    { url: "https://lh3.googleusercontent.com/aida-public/AB6AXuBxxgOmyOET1rvG5K7pETxV0GmBaKJB791C_RpjTF2yMbOGVsr3E24VBXP0p2DTk9hQJ07q3um2CHRZOJ5YsTSDQ32l69p0vH38AyX3vMJYdZCrkiouzh7XKfLRpHZ7909liNdXHnlxqPQ82feptGuaZ7m7Bs8J8IrGX4Y1xIfFm8UexjtJypTOKjgZnIMAmZ-7N_OEXm6e_4WrmY02XRunfZxmxn0W19Adjpvh64wEps2EtSz7NwZ0aGnFombC-mo4y_KQzpwoXa0D", cap: "水門美食" },
+    { url: "https://lh3.googleusercontent.com/aida-public/AB6AXuCkYAyyVlWLfz7ZIYYp60SL_8QW4U_NQ656FPtl1wOmHRExfg3x_RKMhI5BuDjDrWJJ2kYw43RfsInWoRjsNnf5URoYCPn_lOoM5EdqpbwWbpC-w5LeUAhCFaabGfM8gpJE3l8X1b62sXriQ8_ngY57T5D3FDY35ePV0ikxBhKYaE7J4L13INFo28kJyOAGXSuIiX3-sVq3puj-sAW9IcHMtCbS3UkXA9dmCLs8W78UybPgH8Q8tCA5ZE5tACNtx0PlMf5z-SgMQWoA", cap: "Vince Hotel" },
+  ],
+  [
+    { url: "https://lh3.googleusercontent.com/aida-public/AB6AXuAar7CMsXhU54HtZidZUpP5hIWvwL-C62G3ABB0r77eU8blRQGgGG4SGTVAI7iJjJSjNgAk3bu-sjETF-ZONcGU008MNggum6GGMh-UdaD3aZWKJNUwGWFOuT6WeC85UjckgI6gi4M34AjkddxNVuBFVestt8FxdzyRryJ4soSb-2GpKZZymVfJbCpe8TW_31wVtFYuzRLuy3dAC7YW8XwwEwiHAlJ6KgEPv1UZw1YIVUfjlRt2BUFVtbXFFhdYRAthxWF59EAiWUae", cap: "榮泰豬肉粉" },
+    { url: "https://lh3.googleusercontent.com/aida-public/AB6AXuBc9N5PZk5OnLPJ6vhH4lZEcjVjkGATA9ZETjK6P3zBdfdNMZckuB4MQEF-XCA6GY_tIIuIkTjJpNYeGWD8cw5SOfSZ1aMXxwRVaP1zkPOELnXVaJ7OAv2iG8DYNDtpnI3qTgdjXfuZ08I0pQe2HchWbrQKuiT-EyhSg6F10ZoyaJnary0p16z7Mzs11IEAT_aWexPxz9UCgQYzLwyeaVuwS8wU2uvveDWsPFTNIR681juNhSd7HhyOpLEgUaRnTuvkQMiMhREiQIXM", cap: "Let's Relax SPA" },
+    { url: "https://lh3.googleusercontent.com/aida-public/AB6AXuCAe4GOLqRxiC8_mlvzvfYcOsT-kXMYp62RB3evJ7J7Xp2h-Xr4JzMplY9X1u4iSAHX-4j3WFr5W-iqvuv5l8Gka0DpA-2ieXXF2X80PDdt8CVTZJQYCMdhSU5_wue7JDS4R6H_2SSn76jsymN9oAJKuMsmP-P6V_mPPp473ws53Qk16mq-H-BDseEjQvyDo0WRqkYBqnbaXKbqKde6Gy2EmoDlRc4X6eI6Fl2mEyKBsZpy6uVxhlMUAZSarjIY5XL1EAqrOMFJkX_v", cap: "Terminal 21" },
+  ],
+  [
+    { url: "https://lh3.googleusercontent.com/aida-public/AB6AXuCaQgofucLRnfP-_zwzG8MxLnbP3HRyvYJD9ri-SuURvC0sT8LEcFRXWM2TaXARbIxfgUSsYLq22mz8vCYpCWTOQ-a_JIYbcx05CZs18SenJTT1n0m0SKQgeK8ruvJ-oilPOf81KQ07IsxvUncSCrBujFtXmynbMjUgEp7_11zv4OOpojekvczI4O64WBbQhwGQkhWL141kiYVWNIDh6weEtMez6Oi0VIA1L5GgrNA6aSdeI0epGmzB-yu8LdWHGYnNt9f1dSuooOb5", cap: "CentralWorld" },
+    { url: "https://lh3.googleusercontent.com/aida-public/AB6AXuAp8ZIHlp0PRtnLttnDW--EmzmSIq31jl9dWq_E9OasMwj0tR9LA_c3y8D9quBdOQBgXpVL5iXHyDsvHgTA7GmPHnmhG0EJMP4CvC4_BwvGEPCkOcd0mg_PzowGG6xkzTY-xq9Lf99qcQ-Cdu0j5nIUId0uNdgLvRWY0xMf4K0aG2pVGoshKL5GwuH28Xl6K0tuatPHMWQIRF0vmLpB93hbstuTNpbof0ettmPfoeBr1Impl98ngi1GIoL7o5v1Y4Cb2jvD5FlpiFUm", cap: "SOURI 馬卡龍" },
+    { url: "https://lh3.googleusercontent.com/aida-public/AB6AXuBSLSH6ZnwOeLe1cvdjMPXzb35pCmEXYLNAU-yv9-rGaIr90GlNU-3NKknvw8t9pLP6aAevvBhX-pmLh9OAQ324eMHwPIbKrKBgfOm1yVO1v0eRiuW4yqO1cL04C8dq1VLflOOb82YeimAX_jC9NW0kwhGeSVnxNEsx7kaCe0FJm6yel4xvP6LvBkV0iPVihejMzebNp_sUsrtnlFN1XoAeAJ-fejPIYLGFVx0duHa8Sou-n-lLkOzOgMLovi6gJtBpvfzvnvzRKLY4", cap: "Mookata 火烤" },
+  ],
+  [
+    { url: "https://lh3.googleusercontent.com/aida-public/AB6AXuAtzfngBEa6lM6tyTA_k0egE_RgkrNUHl7DA3rO8IkHhFRuxa2ufNFZnjnrWDynsRzuY96LNukXlQnzq6UQ3BFX6xauqbKD539oouT5SwCx0TebmcTfkOBdc6KaPO2I8wf6JXscrquyMS36tatjGT0lN6XnNRBIwR7EMlRkoRGszy2em0-ZZvcBbsOxwc6JjSPTCho3Xm5X5RoKbeeNmuQMktFJK9D21Y0GqAUoCaXpebZQaCip2Zw8FPLwTgM8TTA2BtVRTApArbPs", cap: "恰圖恰週末市集" },
+    { url: "https://lh3.googleusercontent.com/aida-public/AB6AXuB24sL5V7rNtv-Fb_2r43LRSmdSZGVfMCiIzNPzN-BkKlglWgwLxGxdpVMczE0TH6UUWQZFJdJ97XmahuGS4U6XWpPoRq-3CYlpKM3gat63yZeORA-fboz0LXBOOc2fgXDcqANk36Rgl057g2Omv3kwi7CzwLn9AcDDc343e8-GzvGhHJr_xvHOM_XSYCcEoRDsV_VjRPeBIfFxEvWluDwRFsLtd9BnhCWY4aabAnvg3d_716ZX0WlmPHiEoYkVerXPoTdnZDIP7Z2T", cap: "EmSphere 夜逛" },
+    { url: "https://lh3.googleusercontent.com/aida-public/AB6AXuCebnkp41u3vkL6s5ktCeJj8JsmgNxkfT6G8dl1iab04bwL6vfDHhVnfwoHTt1qck4RonXLsrbKj4g0dc701qt3scpj9CQcYpdYl16VArZRbXNWgKajJi801X_r_Is4WqtnnmxJnsIZcKTNLB9G2S9eMJPKEPPYdFixbTUTcCA0Rk-aGY7s_fUNYoMWBSO870lB-xyiGnJLLGljxMxTSwiNWzilQG3frjjgjI27ukHJvDRxOFPiVWVqCHE9KRxepGckWvns_ktyVlyf", cap: "平價按摩街" },
+  ],
+  [
+    { url: "https://lh3.googleusercontent.com/aida-public/AB6AXuAPDX1xhmjRDv8JBe4rYOHD8yTHCIWSRJPanrVDKUYIAEKrhWXoplNyhG-MLLoWd2ADyWz9ZpASkx1iePqY_0UwkI-99KuINaIdLjedRvp_SwAAYi52PQemZ2lFCPl2Qzk_L6thz0sKTkF56XJUT0g3OClkvqizp52BTPQmTliSbOXqRk7Td04Np83t8XSz2XGsevqduVdOfxNqCxkbKX6fbMQDtHuWWTyZDulrzVtJ6CKzCWecn1AEiY8wkSYLZ6sjlGZ3izRTxUWa", cap: "臥佛寺" },
+    { url: "https://lh3.googleusercontent.com/aida-public/AB6AXuA2yymuR0pzsmGid7iXdJ9x0qsiXj8GT51qv_AMArFuYIFfS5MrXVckrAVlddnZxIXuTZjdpvg3G0p3SDoeO_HiBUrf7zNcHoMVXCA5N_NtJ_M4zHhTfi-lxILpKsa5N6G9X0XFT80S-Vyy2MfXacpE16E7rhtIJKjKqekQqCssl6d6P_VN1TX7wYldcl2gYH2gcmX_dtrtRvZdTwpCk-q5JJWIuhE1eY3AKyY_XNy2AsegWC-9upaQaLWMo_96NF0B32zE41jj-w2E", cap: "鄭王廟夕陽" },
+    { url: "https://lh3.googleusercontent.com/aida-public/AB6AXuAnViplXPlqEfz4Nm1aJsB6KwktyTBks1FawzH8N5pF474imuW2CHcBgpE6D-LKnCxA8S9dcJJyK6C-QSe7hU4-oQtbkZFYPrNpf4NZHb9srZh75JGQWlQWxx0IqxyCtf4Ri1fetP200Q-vXxVlyzZTYTLOzUiKKAerVmMyqtw8Rme0hqPnDULE2aYyY-uYb46Hzli0gLcDt8-MP2r01RoY-CdGqMhrto-fdxA0LItx9O622jEOvvgjjVcgRctR6V8YZHNlQBzS_t8d", cap: "ICONSIAM" },
+  ],
+  [
+    { url: "https://lh3.googleusercontent.com/aida-public/AB6AXuD5e9WmsPEtjpdGsM-TwQppQ1LmtkTDJhDg-9a_B7hOINBhSn5zNM__pCUuDySPCzeN5ZgygfCLRq2NdIjrkK_WCU_Tf4CYfv2_Cxzh3XtpetPzo0JfxvT_dtEgTj9hIehgn4d_ZdkLiYxBPxlah-bSUMcRiOaU0xM1dZ7Ex0z1WwAniJ9gXdQiWwu42UenrKpTNaqgRonnekS-pHez_bUyNcAKzCqF0d7t-lBxVyrxoiCgALx1GY5SzBUaWyWeBwJ7F9bDx16upt1Q", cap: "詩大晨間市集" },
+    { url: "https://lh3.googleusercontent.com/aida-public/AB6AXuA3C29Kz4F8LxIEsunNBcTsHldurQrc1E-BC4z6xmUN7mHFCeBUGAtZfgBLDVxmcgdv4Q1Z8b7-QLO_aYeL6M2EUZLUChm70lQVh1_DEzlUtGTx57WK1gnhpvCwILoCJnubov-RO81XM80pYPEV5utNshNSDKNoFhyeTOCQQnjJdZwAjdrvbYEC8HmdfBFzOouCpkovuhbfGnOE7lUPlZ9VH17TpdERCHv9z02kKBAEKhiVD3fNezpoH5UsPz5uclqt3L4eEmaCJU0f", cap: "最後一杯泰奶" },
+    { url: "https://lh3.googleusercontent.com/aida-public/AB6AXuD19kWdfBcIBf5XHASk_KOWFDoin0lakWcboP60Pv1xp9KpCdRXX8oBfzC0J1J-sy3zI8jFNpp_AFmisf_1XlYstSoYu0A_YDN95nPypDFamE3XmPGj7B06qw1CWEMeCIH46o2CGfIBY_YNjrqskAgzgclkSy9gFfgW6sonMunfxi8kIavh3Jkcun9QsF6uKTiTH55euNuymcYfnFmbokjKgIMIGIg5ColgWC5CX_cOhhn4bu3w9-wiZq6TNQZM4uvlETtxv7eOLwId", cap: "歸途 BKK" },
+  ],
+];
+
+const DAYS = [
+  {
+    day: 1, date: "5/28 Thu", label: "抵達日", subtitle: "機場換錢 · 水門商圈",
+    color: "#C8A96E", emoji: "✈️",
+    schedule: [
+      { time: "12:10", title: "抵達曼谷 BKK 機場", desc: "素萬那普國際機場入境", maps: "https://maps.google.com/?q=Suvarnabhumi+Airport+Bangkok" },
+      { time: "13:00", title: "SuperRich 機場換錢", desc: "前往 B1（機場快線層）換好主要現金。匯率最優，比銀行好 5–8%。", maps: "https://maps.google.com/?q=Super+Rich+Suvarnabhumi+Airport", editorial: "SuperRich 是曼谷公認匯率最優的換匯點，機場 B1 樓即有分店，入境後最優先處理。" },
+      { time: "15:00", title: "Vince Hotel Pratunam — Check-in", desc: "入住 Vince Hotel Pratunam，位於水門商圈核心，步行可達 Platinum Fashion Mall。飯店提供免費腳底按摩，晚上記得預約房務。", maps: "https://maps.google.com/?q=Vince+Hotel+Pratunam+Bangkok", editorial: "Vince Hotel Pratunam 是此次行程的大本營。鄰近水門夜市與 Platinum Fashion Mall，地理位置絕佳。晚間提供免費按摩服務，建議一 Check-in 便預約。", tags: ["Vince Hotel", "水門核心", "免費按摩"] },
+      { time: "18:00", title: "Platinum Fashion Mall（水門市場）", desc: "曼谷平價時尚聖地，批發級定價的服飾、配件與包包。", maps: "https://maps.google.com/?q=Platinum+Fashion+Mall+Bangkok" },
+      { time: "19:30", title: "晚餐：水門美食群聚", desc: "多選擇：紅大哥海南雞飯（米其林）、水門婆婆粥、小碗公船麵、水門豬腳飯、ThePlace168 冬蔭功麵", maps: "https://maps.google.com/?q=Pratunam+food+Bangkok", editorial: "紅大哥海南雞飯為米其林必比登推介，招牌必點：海南雞飯、香滑雞骨湯、泰奶。建議 19:30 前抵達，避免候位。", tags: ["米其林必比登", "海南雞飯", "冬蔭功"] },
+    ],
+    tips: ["晚上可在飯店享受免費按摩，記得提前預約房務", "水門市場晚間人潮多，保管好隨身物品"]
+  },
+  {
+    day: 2, date: "5/29 Fri", label: "Asok 美食日", subtitle: "榮泰豬肉粉 · Let's Relax SPA · 週五夜市",
+    color: "#D4845A", emoji: "🍜",
+    schedule: [
+      { time: "", title: "📍 今天在外吃米其林早餐", desc: "榮泰豬肉粉是今天的早餐目標，建議一出發就直接前往，早鳥時段人少體感最好。", isNote: true },
+      { time: "08:30", title: "BTS → Phrom Phong (E5)", desc: "從 Ratchathewi 站搭乘 BTS 前往 Phrom Phong，約 3 站直達。", maps: "https://maps.google.com/?q=Phrom+Phong+BTS+Bangkok" },
+      { time: "09:00", title: "榮泰豬肉粉（Rung Rueang）", desc: "早鳥時段人少！建議點「乾麵＋魚皮」，老饕標配。有兩間店面（左/右），哪間有位子就坐哪間。", maps: "https://maps.google.com/?q=Rung+Rueang+Pork+Noodle+Bangkok", editorial: "榮泰是曼谷極具代表性的豬肉粉老店，早上去人少體驗最佳。魚皮是隱藏必點，酥脆不腥。", tags: ["在地老饕", "乾麵+魚皮"] },
+      { time: "10:00", title: "Let's Relax Spa（Terminal 21 6F）", desc: "從榮泰搭一站 BTS 到 Asok。一早按摩體感最放鬆，需提前透過 KKday / Klook 預訂。", maps: "https://maps.google.com/?q=Let%27s+Relax+Spa+Terminal+21+Bangkok", editorial: "預約方式：官網結帳後，透過 Line: @letsrelaxspa 或信箱 sparsvn@letsrelaxspa.com 確認時段。最晚提前一天完成。", tags: ["需提前預約", "Klook 訂票"] },
+      { time: "12:30", title: "Terminal 21 Asok", desc: "Pier 21 美食街（4-5F）超便宜正宗！需先儲值 Food Court Card。各樓層有不同主題廁所（必拍）。G 樓 After You Dessert Cafe 泰式雪綿冰必吃。", maps: "https://maps.google.com/?q=Terminal+21+Asok+Bangkok", editorial: "Pier 21 是行程中 CP 值最高的美食街。儲值卡離場前可退餘額。Breezy 平價香氛在 3F 西洋棋騎士後方，櫃號 3121。", tags: ["Pier 21 美食街", "Chago 飲料", "Breezy 香氛 3F"] },
+      { time: "14:30", title: "EmSphere（選配）", desc: "走空橋回 Phrom Phong 逛最新百貨。看 Gentle Monster 巨型狗狗裝置藝術。", maps: "https://maps.google.com/?q=EmSphere+Bangkok" },
+      { time: "17:00", title: "返回飯店充電", desc: "避開下班尖峰與午後雷陣雨。曼谷五月下午約 16-18 點容易有短暫陣雨。" },
+      { time: "19:30", title: "SWU 詩大週五夜市", desc: "體驗在地大學生氛圍，泰式道地小吃與平價服飾。BTS 綠線直達，動線集中。", maps: "https://maps.google.com/?q=SWU+Night+Market+Bangkok" },
+    ],
+    tips: ["Let's Relax Spa 最遲前一天預約，Klook 可買折扣票", "Pier 21 食街使用儲值卡，離場時退餘款"]
+  },
+  {
+    day: 3, date: "5/30 Sat", label: "Siam 核心區", subtitle: "泰奶巡禮 · Big C 大採買 · 平價燒烤",
+    color: "#6BA58A", emoji: "🛍️",
+    schedule: [
+      { time: "", title: "📍 飯店悠閒享用早餐後出發", desc: "今天行程相對輕鬆，不用太早，在飯店吃完早餐再出發即可。", isNote: true },
+      { time: "09:30", title: "Chago 飲料（Rama I）", desc: "入手曼谷網紅飲料。甜度建議選 50% 或更低，更能喝出茶香層次。", maps: "https://maps.google.com/?q=Chago+Bangkok", tags: ["甜度建議 50%"] },
+      { time: "10:15", title: "Siam Paragon", desc: "首要任務：直奔 M/G 樓尋找 SOURI 馬卡龍。B 樓有 SuperRich 備用換匯。", maps: "https://maps.google.com/?q=Siam+Paragon+Bangkok", editorial: "SOURI 為泰國明星 Win Metawin 創立，馬卡龍熱門口味常提早售罄，建議開門即衝。", tags: ["SOURI 馬卡龍", "SuperRich 備用"] },
+      { time: "11:30", title: "CentralWorld（核心戰場）", desc: "泰奶大匯集：One to Two（1F）、ChaTraMue 手標牌（B樓/7F）、Karun 冰沙（7F Beacon Zone）。", maps: "https://maps.google.com/?q=CentralWorld+Bangkok", editorial: "建議動線：2F 入場 → 直衝 7F 搶 Karun 冰沙與 SOURI → 下 1F 找 One to Two → B 樓手標牌茶粉。", tags: ["Karun 冰沙 7F", "One to Two 1F", "手標牌 B樓/7F"] },
+      { time: "14:30", title: "Big C Supercenter（Rajdamri）", desc: "CentralWorld 正對面，過空橋即達。採買：海苔、泡麵、泰式奶茶包。有觀光客快速結帳通道。", maps: "https://maps.google.com/?q=Big+C+Rajdamri+Bangkok", editorial: "建議購買：Mama 泡麵、Tao Kae Noi 海苔、ChaTraMue 茶粉禮盒。採購完直接叫 Grab 回飯店。", tags: ["伴手禮重點站", "Grab 回飯店"] },
+      { time: "16:30", title: "Grab 撤退回飯店", desc: "Big C 戰利品通常非常重，建議直接叫 Grab/Bolt 回飯店放物資，順便小憩。" },
+      { time: "18:00", title: "Nak-La Mookata（MBK Center 2F）", desc: "平價泰式燒烤吃到飽，環境乾淨有冷氣！約 279-300+ 泰銖。泰式「火烤兩吃」體驗。", maps: "https://maps.google.com/?q=Nak+La+Mookata+MBK+Bangkok", editorial: "泰式 Mookata 是「烤肉 + 涮涮鍋」二合一：中央鍋蓋烤肉，周圍湯汁煮蔬菜。MBK 分店有冷氣，是觀光客最友善的選擇。", tags: ["吃到飽 ~280฿", "有冷氣", "火烤兩吃"] },
+    ],
+    tips: ["CentralWorld 極大，從一端到另一端約 10 分鐘，拍下地圖看板", "Big C 採購完直接叫 Grab，省力省時"]
+  },
+  {
+    day: 4, date: "5/31 Sun", label: "恰圖恰週末", subtitle: "市集掃貨 · EmSphere 夜逛 · 平價按摩",
+    color: "#9B7BB5", emoji: "🌿",
+    schedule: [
+      { time: "", title: "📍 不要太晚出門！下午很熱", desc: "恰圖恰下午非常熱，建議 9 點前就出門，早去早回。太晚出發會直接面對正午烈日。", isNote: true },
+      { time: "09:30", title: "Chatuchak Weekend Market", desc: "曼谷最大週末市集，超過 8,000 個攤位。古著、手工藝品、家具、美食一應俱全。", maps: "https://maps.google.com/?q=Chatuchak+Weekend+Market+Bangkok", editorial: "建議攜帶：現金為主（部分攤位不接受刷卡）、可折疊購物袋、防曬。早去人少，10 點後人潮爆炸。", tags: ["週六週日限定", "帶現金"] },
+      { time: "13:00", title: "Mixt Chatuchak（冷氣休息）", desc: "恰圖恰旁有冷氣的用餐與休息區，有各式餐廳與咖啡。避開戶外酷暑稍作休息。", maps: "https://maps.google.com/?q=Mixt+Chatuchak+Bangkok" },
+      { time: "15:30", title: "返回飯店放戰利品 + 洗澡", desc: "恰圖恰非常熱，回飯店洗澡換裝。再出發前充飽電。" },
+      { time: "17:30", title: "EmSphere 夜間逛街（Phrom Phong E5）", desc: "G 樓美食區與 1 樓夜間燈光全開，氛圍像夜店一樣潮。3 樓有全泰首間市區 IKEA。", maps: "https://maps.google.com/?q=EmSphere+Bangkok", tags: ["夜間最美", "市區 IKEA 3F"] },
+      { time: "18:30", title: "晚餐：Here Hai（暫定）", desc: "必點招牌：蟹肉炒飯（超強招牌）、炸豬頸肉、歐姆蛋蝦。建議提前訂位或早點抵達排隊。", maps: "https://maps.google.com/?q=Here+Hai+Bangkok", tags: ["蟹肉炒飯", "炸豬頸肉", "歐姆蛋蝦"] },
+      { time: "19:30", title: "按摩（Sukhumvit 24 或 On Nut）", desc: "Phrom Phong 站附近 Refresh @ 24 高評價。On Nut 站（77/1 巷）是按摩平價區，BTS 直達，無需預約。", maps: "https://maps.google.com/?q=Sukhumvit+24+massage+Bangkok", editorial: "Takrai Hom 是巷口高評價之一。On Nut 按摩平價區無需預約，隨到隨按。", tags: ["Refresh @ 24", "無需預約"] },
+    ],
+    tips: ["恰圖恰下午最熱，建議 9 點進場、13 點前撤退", "On Nut 站按摩平價區 BTS 直達，不需預約"]
+  },
+  {
+    day: 5, date: "6/01 Mon", label: "古蹟與河岸日", subtitle: "臥佛寺 · 鄭王廟 · ICONSIAM · 夕陽",
+    color: "#C85A3A", emoji: "🌅",
+    schedule: [
+      { time: "", title: "📍 今天需早起，Grab 直接去", desc: "臥佛寺建議 8 點前出門，氣溫涼爽、遊客最少。直接叫 Grab，比搭 BTS 轉船便宜。", isNote: true },
+      { time: "08:30", title: "Wat Pho（臥佛寺）", desc: "參觀 46 公尺長金色臥佛。這裡也有全泰最正宗的傳統按摩學校，可體驗「古法按摩」。", maps: "https://maps.google.com/?q=Wat+Pho+Bangkok", editorial: "臥佛寺按摩是全泰最正宗的古法按摩認證學校所在地，早上預約等候時間短。", tags: ["正宗古法按摩", "早去人少"] },
+      { time: "10:00", title: "Tha Tien Pier → 渡輪（5 泰銖）", desc: "從 Tha Tien 碼頭搭乘跨河渡輪前往對岸，僅需 5 泰銖，全曼谷最超值體驗之一。", maps: "https://maps.google.com/?q=Tha+Tien+Pier+Bangkok" },
+      { time: "10:15", title: "Wat Arun（鄭王廟）", desc: "趁著陽光尚未到正午，拍下潔白陶瓷塔身。11:00 前完成泰服拍照，避免化妝被曬融。", maps: "https://maps.google.com/?q=Wat+Arun+Bangkok", editorial: "鄭王廟陶瓷塔由碎瓷片拼貼而成，近看細節精緻。泰服體驗約 300-500 泰銖含換裝。", tags: ["泰服體驗", "11點前完成"] },
+      { time: "11:30", title: "接駁船前往 ICONSIAM", desc: "從鄭王廟碼頭搭乘接駁船（藍色旗或橘色旗），約 10-15 分鐘船程。", maps: "https://maps.google.com/?q=ICONSIAM+Bangkok" },
+      { time: "12:00", title: "午餐：SookSiam 室內水上市場（1F）", desc: "ICONSIAM 1 樓室內仿水上市場，集合全泰國各地特色小吃，吹冷氣吃遍泰國！", maps: "https://maps.google.com/?q=ICONSIAM+SookSiam+Bangkok", editorial: "SookSiam 超過 100 個攤位，每個攤位代表泰國不同省份的特色美食。", tags: ["室內水上市場", "全泰小吃"] },
+      { time: "14:00", title: "掃貨 + 打卡（ICONSIAM）", desc: "Gentle Monster 巨型臘腸狗（M 樓）、SOURI 馬卡龍、6F 全泰最大星巴克俯瞰河景。", maps: "https://maps.google.com/?q=ICONSIAM+Bangkok", tags: ["Gentle Monster M樓", "SOURI 馬卡龍", "星巴克 6F"] },
+      { time: "18:00", title: "夕陽時間（二選一）", desc: "方案 A：ViVi The Coffee Place — 河岸邊，看鄭王廟最近，咖啡親民。\n方案 B：EAGLE NEST Rooftop Bar — 視野更高，同時拍到臥佛寺後方與鄭王廟夕陽。", maps: "https://maps.google.com/?q=ViVi+The+Coffee+Place+Bangkok", editorial: "18:00–18:30 是黃金拍照時刻。鄭王廟夕陽被攝影雜誌評為東南亞十大最美夕陽之一。", tags: ["黃金拍照 18:00–18:30"] },
+      { time: "20:30", title: "Asiatique 河濱夜市（選配）", desc: "從 Sathorn Pier 搭免費接駁船前往，泰式表演、River Mall 全在此。", maps: "https://maps.google.com/?q=Asiatique+The+Riverfront+Bangkok" },
+    ],
+    tips: ["Grab 直達臥佛寺比 BTS 轉船便宜且省力", "ICONSIAM 接駁船傍晚人多，提前 10 分鐘到碼頭"]
+  },
+  {
+    day: 6, date: "6/02 Tue", label: "歸途日", subtitle: "晨間市集最後補貨 · 返航",
+    color: "#4A8FA8", emoji: "🏠",
+    schedule: [
+      { time: "", title: "📍 市集 6:30 就開，可邊逛邊吃早餐", desc: "市集 6:30 開始營業，可選擇在飯店吃早餐後前往，或直接去市集吃早餐。", isNote: true },
+      { time: "09:00", title: "SWU 詩大週二晨間市集", desc: "最後補貨！在地大學生擺攤，古著、手工藝、文創小物應有盡有。", maps: "https://maps.google.com/?q=SWU+Flea+Market+Bangkok", editorial: "詩大市集氛圍輕鬆悠閒，是離開前再體驗一次道地曼谷生活感的最佳選擇。", tags: ["週二限定", "文創古著"] },
+      { time: "12:00", title: "整理行李，準備前往機場", desc: "建議提前確認行李重量（特別是 Big C 戰利品），超重費用高昂。" },
+      { time: "17:30", title: "✈️ 搭機回台", desc: "帶著滿載的戰利品、照片與回憶，期待下次再見曼谷。", maps: "https://maps.google.com/?q=Suvarnabhumi+Airport+Bangkok" },
+    ],
+    tips: ["提前 2 小時到機場，曼谷塞車嚴重建議提早出發", "機場離境前可在 Duty Free 購買最後伴手禮"]
+  }
+];
+
+const SURVIVAL = {
+  0: [
+    {icon:'💴',label:'SuperRich 機場 B1',detail:'入境首選，匯率最優。前往 B1（機場快線層）換好主要現金，比銀行好 5–8%',maps:'https://maps.google.com/?q=Super+Rich+Suvarnabhumi+Airport'},
+    {icon:'🚇',label:'BTS 兔子卡',detail:'儲值卡無需每次買票，閘口刷卡即進，BTS 綠線貫穿本次行程所有主要景點',maps:'https://maps.google.com/?q=BTS+Skytrain+Bangkok'},
+    {icon:'🚗',label:'Grab / Bolt',detail:'東南亞版 Uber，費用透明。大採購後直接叫車回飯店最省力',maps:''},
+  ],
+  1: [
+    {icon:'💆',label:"Let's Relax Spa 預約",detail:"需提前透過 Klook/KKday 結帳，最晚前一天透過 Line: @letsrelaxspa 確認時段",maps:'https://maps.google.com/?q=Let%27s+Relax+Spa+Terminal+21'},
+    {icon:'🛍️',label:'Breezy 平價香氛',detail:'Terminal 21 Asok 3F，西洋棋騎士後方，櫃號 3121',maps:'https://maps.google.com/?q=Terminal+21+Asok+Bangkok'},
+  ],
+  2: [
+    {icon:'🛍️',label:'SOURI 馬卡龍',detail:'Win Metawin 創立品牌。CentralWorld 7F 開門即衝，熱門口味上午就售完',maps:'https://maps.google.com/?q=Souri+Macaron+Bangkok'},
+    {icon:'🛍️',label:'Big C 觀光客快速通道',detail:'Rajdamri 分店設有專屬觀光客快速結帳，採購完直接叫 Grab',maps:'https://maps.google.com/?q=Big+C+Rajdamri+Bangkok'},
+    {icon:'🧋',label:'泰奶甜度指南',detail:'Chago 建議 50% · Karun 冰沙 7F（加金箔超好拍）· ChaTraMue 茶粉禮盒是伴手禮首選',maps:''},
+  ],
+  3: [
+    {icon:'💆',label:'On Nut 按摩平價區',detail:'Sukhumvit 77/1 巷，BTS On Nut 站直達，無需預約隨到隨按，價格是市中心的一半',maps:'https://maps.google.com/?q=Takrai+Hom+Massage+Bangkok'},
+    {icon:'💆',label:'Refresh @ Sukhumvit 24',detail:'Phrom Phong 站附近的高評價按摩店，EmSphere 逛完後步行可達',maps:'https://maps.google.com/?q=Sukhumvit+24+massage+Bangkok'},
+  ],
+  4: [
+    {icon:'🚢',label:'ICONSIAM 免費接駁船',detail:'Sathorn Pier ↔ ICONSIAM 免費，每 15–30 分鐘一班。傍晚人多，提前 10 分鐘排隊',maps:'https://maps.google.com/?q=Sathorn+Pier+Bangkok'},
+    {icon:'💆',label:'臥佛寺傳統按摩學校',detail:'全泰國最正宗古法按摩認證學校，Wat Pho 內。早上等候時間短',maps:'https://maps.google.com/?q=Wat+Pho+Traditional+Massage+School'},
+  ],
+  5: [
+    {icon:'✈️',label:'機場退稅 VAT Refund',detail:'購物滿 2,000 泰銖以上索取退稅單，機場離境前辦理，可退 7% 增值稅',maps:'https://maps.google.com/?q=Suvarnabhumi+Airport+Bangkok'},
+    {icon:'💰',label:'剩餘泰銖處理',detail:'機場 Duty Free 可使用泰銖消費，或在市區 SuperRich 換回台幣',maps:''},
+  ],
+};
+
+// ── Render ──────────────────────────────────────────────────────
+let activeDay = 0;
+let openItems = {};
+
+function mapBtn(url) {
+  if (!url) return '';
+  return `<a class="map-btn" href="${url}" target="_blank">⊕ MAP</a>`;
+}
+
+function renderTabs() {
+  const tabs = document.getElementById('dayTabs');
+  tabs.innerHTML = DAYS.map((d, i) => `
+    <div class="day-tab ${i===activeDay?'active':''}" onclick="showDay(${i})" id="tab_${i}">
+      <span class="tab-day">D${d.day} · ${d.date.split(' ')[0]}</span>
+      <span class="tab-label">${d.label}</span>
+    </div>
+  `).join('');
+  setTimeout(() => {
+    const el = document.getElementById(`tab_${activeDay}`);
+    if (el) el.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+  }, 50);
+}
+
+function renderPages() {
+  const container = document.getElementById('pages');
+  container.innerHTML = DAYS.map((d, dayIdx) => {
+    const color = d.color;
+    const photos = DAY_PHOTOS[dayIdx] || [];
+    const survItems = SURVIVAL[dayIdx] || [];
+    const notes = d.schedule.filter(s => s.isNote);
+    const items = d.schedule.filter(s => !s.isNote);
+
+    const heroPhoto = photos[0]
+      ? `<img src="${photos[0].url}" alt="${photos[0].cap}" loading="lazy"/>`
+      : `<div style="background:${color}33;width:100%;height:100%;"></div>`;
+
+    const noteBanners = notes.map(n => `
+      <div class="note-banner" style="border-left-color:${color};">
+        <div class="note-title">${n.title}</div>
+        <div class="note-desc">${n.desc}</div>
+      </div>`).join('');
+
+    const schedHtml = items.map((item, i) => {
+      const key = `${dayIdx}_${i}`;
+      return `
+      <div class="sched-item">
+        <div class="sched-dot" id="dot_${key}"></div>
+        <div class="sched-header" onclick="toggleItem('${key}','${color}')">
+          ${item.time ? `<div class="sched-time">${item.time}</div>` : ''}
+          <div style="display:flex;align-items:flex-start;gap:8px;">
+            <div class="sched-title" style="flex:1;">${item.title}</div>
+            <div class="chevron" id="chev_${key}"></div>
+          </div>
+          <div class="sched-meta">
+            ${item.maps ? mapBtn(item.maps) : ''}
+            ${(item.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}
+          </div>
+        </div>
+        <div class="sched-body" id="body_${key}">
+          <div class="sched-desc">${item.desc||''}</div>
+          ${item.editorial ? `
+          <div class="editorial-note">
+            <div class="editorial-label" style="color:${color};">✦ EDITORIAL NOTE</div>
+            <div class="editorial-text">${item.editorial}</div>
+          </div>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+
+    const tipsHtml = d.tips?.length ? `
+      <div class="tips-block" style="border-top-color:${color};">
+        <div class="tips-label" style="color:${color};">✦ TIPS</div>
+        ${d.tips.map(t=>`<div class="tip-row"><span class="tip-arrow" style="color:${color};">›</span><span>${t}</span></div>`).join('')}
+      </div>` : '';
+
+    const survHtml = survItems.length ? `
+      <div class="today-info" style="border-top-color:${color};">
+        <div class="today-info-label" style="color:${color};">✦ 今日實用情報</div>
+        ${survItems.map(s=>`
+        <div class="info-item">
+          <span class="info-icon">${s.icon}</span>
+          <div class="info-content">
+            <div class="info-label">${s.label}</div>
+            <div class="info-detail">${s.detail}</div>
+          </div>
+          ${s.maps ? `<a class="info-map" href="${s.maps}" target="_blank">⊕ MAP</a>` : ''}
+        </div>`).join('')}
+      </div>` : '';
+
+    const photoGridHtml = photos.length >= 2 ? `
+      <div class="photo-grid">
+        <div class="photo-tile photo-main">
+          <img src="${photos[1].url}" alt="${photos[1].cap}" loading="lazy"/>
+          <div class="photo-cap">${photos[1].cap.toUpperCase()}</div>
+        </div>
+        <div class="photo-col">
+          ${photos[2] ? `<div class="photo-tile">
+            <img src="${photos[2].url}" alt="${photos[2].cap}" loading="lazy"/>
+            <div class="photo-cap">${photos[2].cap.toUpperCase()}</div>
+          </div>` : ''}
+        </div>
+      </div>` : '';
+
+    return `
+    <div class="page ${dayIdx===activeDay?'active':''}" id="page_${dayIdx}">
+      <div class="day-hero">
+        ${heroPhoto}
+        <div class="day-hero-overlay">
+          <div class="hero-day-label" style="color:${color};">DAY ${d.day} · ${d.date} · ${d.emoji}</div>
+          <div class="hero-title">${d.label}</div>
+          <div class="hero-subtitle">${d.subtitle}</div>
+        </div>
+      </div>
+      ${noteBanners}
+      <div class="section-label">── ITINERARY ──────────────</div>
+      <div class="schedule">${schedHtml}</div>
+      ${tipsHtml}
+      ${survHtml}
+      ${photoGridHtml}
+      <div class="day-spacer"></div>
+    </div>`;
+  }).join('');
+}
+
+function showDay(idx) {
+  document.getElementById(`page_${activeDay}`)?.classList.remove('active');
+  activeDay = idx;
+  openItems = {};
+  document.getElementById(`page_${idx}`)?.classList.add('active');
+  renderTabs();
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function toggleItem(key, color) {
+  openItems[key] = !openItems[key];
+  const body = document.getElementById(`body_${key}`);
+  const chev = document.getElementById(`chev_${key}`);
+  const dot  = document.getElementById(`dot_${key}`);
+  if (body) body.classList.toggle('open', openItems[key]);
+  if (chev) chev.classList.toggle('open', openItems[key]);
+  if (dot)  dot.style.background = openItems[key] ? color : '#D4AF37';
+}
+
+renderPages();
+renderTabs();
+</script>
+
+<!-- ── Service Worker Registration ── -->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(r => console.log('[PWA] SW ready'))
+        .catch(e => console.warn('[PWA] SW error:', e));
+    });
+  }
+</script>
+
+</body>
+</html>
