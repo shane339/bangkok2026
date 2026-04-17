@@ -931,7 +931,7 @@ function syncFromSheets() {
       });
       if (!expenses.length) { alert('沒有找到可匯入的支出資料'); return; }
       // 保留手動輸入的資料，只替換 sheets 來源的部分
-      const manualExps = loadExpenses().filter(e => e.source !== 'sheets');
+      const manualExps = loadExpenses().filter(e => e.source === 'manual');
       const sheetsExps = expenses.map(e => ({ ...e, source: 'sheets' }));
       const merged = [...sheetsExps, ...manualExps];
       const msg = manualExps.length > 0
