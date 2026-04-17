@@ -908,10 +908,14 @@ function syncFromSheets() {
         expenses.push({ id: Date.now() + i, name: useName, amount, paidBy, splitAmong });
       });
       if (!expenses.length) { alert('沒有找到可匯入的支出資料'); return; }
-      if (confirm(`從 Google Sheets 找到 ${expenses.length} 筆支出\n確定覆蓋現有資料匯入？`)) {
-        saveExpenses(expenses);
-        renderLedger();
-      }
+      // 保留手動輸入的資料，只替換 sheets 來源的部分
+      const manualExps = loadExpenses().filter(e => e.source !== 'sheets');
+      const sheetsExps = expenses.map(e => ({ ...e, source: 'sheets' }));
+      const merged = [...sheetsExps, ...manualExps];
+      const msg = manualExps.length > 0
+        ? `從 Sheets 找到 ${sheetsExps.length} 筆\n手機手動輸入的 ${manualExps.length} 筆將保留\n確定同步？`
+        : `從 Google Sheets 找到 ${sheetsExps.length} 筆支出，確定同步？`;
+      if (confirm(msg)) { saveExpenses(merged); renderLedger(); }
     } catch(e) {
       alert('同步失敗：' + e.message);
     } finally {
@@ -989,7 +993,7 @@ function renderRecords() {
       <div class="exp-card">
         <div class="exp-card-info">
           <div class="exp-name">${e.name}</div>
-          <div class="exp-meta">${e.paidBy} 代墊 · 應攤：${e.splitAmong.join('、')}</div>
+          <div class="exp-meta">${e.paidBy} 代墊 · 應攤：${e.splitAmong.join('、')}${e.source === 'manual' ? ' · <span style="color:#C8A96E">手動</span>' : ''}</div>
         </div>
         <span class="exp-amount">NT$&thinsp;${e.amount.toLocaleString()}</span>
         <button class="exp-del" onclick="deleteExpense(${e.id})">✕</button>
@@ -1148,7 +1152,7 @@ function confirmAddExp() {
   if (!amount || amount <= 0) { alert('請填寫有效金額'); return; }
   if (!splitAmong.length) { alert('至少選一位應攤人'); return; }
   const exps = loadExpenses();
-  exps.push({ id: Date.now(), name, amount, paidBy, splitAmong });
+  exps.push({ id: Date.now(), name, amount, paidBy, splitAmong, source: 'manual' });
   saveExpenses(exps);
   closeExpForm();
   renderLedger();
