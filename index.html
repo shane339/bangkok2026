@@ -303,6 +303,202 @@ body { font-family: var(--font-sans); color: var(--text); background: var(--crea
 
 /* ── BOTTOM PADDING for iOS home bar ─────────── */
 .bottom-pad { height: env(safe-area-inset-bottom, 20px); min-height: 20px; }
+
+/* ── LEDGER MODAL ────────────────────────────── */
+.ledger-overlay {
+  display: none; position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.5); align-items: flex-end;
+}
+.ledger-overlay.open { display: flex; }
+.ledger-sheet {
+  width: 100%; max-height: 93vh;
+  background: var(--cream); border-radius: 20px 20px 0 0;
+  display: flex; flex-direction: column;
+  animation: slideUp 0.3s ease; overflow: hidden;
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+.ledger-header {
+  display: flex; align-items: center; padding: 16px 16px 12px; gap: 8px;
+  border-bottom: 1px solid var(--gold-border); flex-shrink: 0;
+}
+.ledger-header-title {
+  flex: 1; font-family: var(--font-serif);
+  font-size: 18px; font-weight: 900; color: var(--text);
+}
+.ledger-close {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: none; background: #EEEBDF; cursor: pointer;
+  font-size: 15px; display: flex; align-items: center; justify-content: center;
+}
+.ledger-tabs {
+  display: flex; padding: 0 16px; gap: 0;
+  border-bottom: 2px solid var(--gold-border); flex-shrink: 0;
+}
+.ledger-tab {
+  padding: 10px 18px; font-size: 13px; font-weight: 700;
+  color: var(--text-muted); cursor: pointer; border: none; background: none;
+  border-bottom: 3px solid transparent; margin-bottom: -2px;
+  font-family: var(--font-sans);
+}
+.ledger-tab.active { color: var(--gold-dark); border-bottom-color: var(--gold-dark); }
+.ledger-body { flex: 1; overflow-y: auto; }
+
+/* Expense cards */
+.exp-list { padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
+.exp-card {
+  background: var(--white); border: 1px solid var(--gold-border);
+  border-radius: 10px; padding: 12px 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.exp-card-info { flex: 1; min-width: 0; }
+.exp-name { font-family: var(--font-serif); font-size: 15px; font-weight: 700; color: var(--text); }
+.exp-meta { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+.exp-amount {
+  font-family: monospace; font-size: 15px; font-weight: 700;
+  color: var(--gold-dark); white-space: nowrap;
+}
+.exp-del {
+  width: 28px; height: 28px; border: none; border-radius: 6px;
+  background: #FFF0F0; color: #C0392B; cursor: pointer; font-size: 14px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.exp-empty {
+  text-align: center; padding: 40px 20px;
+  font-size: 14px; color: var(--text-muted); line-height: 2;
+}
+.add-btn {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  margin: 8px 16px 16px; padding: 14px;
+  background: var(--gold-dark); color: var(--cream);
+  border: none; border-radius: 12px;
+  font-family: var(--font-sans); font-size: 15px; font-weight: 700;
+  cursor: pointer; flex-shrink: 0;
+}
+.add-btn:active { opacity: 0.85; }
+
+/* Add expense form */
+.exp-form-overlay {
+  display: none; position: fixed; inset: 0; z-index: 300;
+  background: rgba(0,0,0,0.55); align-items: flex-end;
+}
+.exp-form-overlay.open { display: flex; }
+.exp-form-sheet {
+  width: 100%; background: var(--cream); border-radius: 20px 20px 0 0;
+  padding: 20px 16px calc(env(safe-area-inset-bottom,16px) + 16px);
+  animation: slideUp 0.25s ease;
+}
+.exp-form-title {
+  font-family: var(--font-serif); font-size: 18px; font-weight: 900;
+  color: var(--text); margin-bottom: 16px;
+}
+.form-row { margin-bottom: 14px; }
+.form-label {
+  font-size: 12px; font-weight: 700; color: var(--text-muted);
+  letter-spacing: 0.05em; margin-bottom: 6px; display: block;
+}
+.form-input {
+  width: 100%; padding: 10px 12px;
+  border: 1.5px solid var(--gold-border); border-radius: 8px;
+  font-size: 15px; font-family: var(--font-sans);
+  background: var(--white); color: var(--text); outline: none;
+}
+.form-input:focus { border-color: var(--gold-dark); }
+.form-select {
+  width: 100%; padding: 10px 12px;
+  border: 1.5px solid var(--gold-border); border-radius: 8px;
+  font-size: 15px; font-family: var(--font-sans);
+  background: var(--white); color: var(--text); outline: none;
+}
+.split-checks { display: flex; gap: 8px; flex-wrap: wrap; }
+.split-check-label {
+  display: flex; align-items: center; gap: 5px;
+  padding: 7px 16px; border-radius: 20px;
+  border: 1.5px solid var(--gold-border);
+  cursor: pointer; font-size: 13px; font-weight: 700;
+  color: var(--text-muted); background: var(--white);
+  transition: all 0.15s; user-select: none;
+}
+.split-check-label input { display: none; }
+.split-check-label.checked {
+  background: var(--gold-dark); color: var(--cream); border-color: var(--gold-dark);
+}
+.form-btns { display: flex; gap: 10px; margin-top: 20px; }
+.form-btn-cancel {
+  flex: 1; padding: 12px; border: 1.5px solid var(--gold-border);
+  border-radius: 10px; font-size: 15px; font-weight: 700;
+  background: var(--white); color: var(--text-muted); cursor: pointer;
+  font-family: var(--font-sans);
+}
+.form-btn-ok {
+  flex: 2; padding: 12px; border: none; border-radius: 10px;
+  font-size: 15px; font-weight: 700;
+  background: var(--gold-dark); color: var(--cream); cursor: pointer;
+  font-family: var(--font-sans);
+}
+.form-btn-ok:active { opacity: 0.85; }
+
+/* Settlement view */
+.settle-wrap { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.settle-card {
+  background: var(--white); border: 1px solid var(--gold-border); border-radius: 12px; overflow: hidden;
+}
+.settle-card-head {
+  display: flex; align-items: center; padding: 14px; cursor: pointer; gap: 10px;
+}
+.settle-card.expanded .settle-card-head { border-bottom: 1px solid var(--gold-border); }
+.settle-name {
+  font-family: var(--font-serif); font-size: 18px; font-weight: 900; color: var(--text); flex: 1;
+}
+.settle-net {
+  font-family: monospace; font-size: 13px; font-weight: 700;
+  padding: 5px 12px; border-radius: 20px;
+}
+.settle-net.receive { background: #E8F5E9; color: #2E7D32; }
+.settle-net.pay     { background: #FFEBEE; color: #C62828; }
+.settle-net.zero    { background: #F5F5F5; color: #666; }
+.settle-detail { display: none; padding: 12px 14px 14px; }
+.settle-card.expanded .settle-detail { display: block; }
+.settle-totals { display: flex; gap: 8px; margin-bottom: 12px; }
+.settle-total-box {
+  flex: 1; text-align: center; padding: 8px;
+  border-radius: 8px; background: var(--cream);
+}
+.settle-total-label { font-size: 10px; color: var(--text-muted); margin-bottom: 3px; }
+.settle-total-val { font-family: monospace; font-size: 13px; font-weight: 700; }
+.settle-sub {
+  font-family: monospace; font-size: 10px; letter-spacing: 0.1em;
+  color: var(--text-muted); margin: 8px 0 5px;
+}
+.settle-row {
+  display: flex; justify-content: space-between;
+  font-size: 12px; padding: 4px 0; border-bottom: 1px solid #F5ECC8;
+}
+.settle-row:last-child { border-bottom: none; }
+.settle-row-amt { font-family: monospace; font-weight: 700; }
+.transfer-section {
+  background: #FFF8E1; border: 1px solid var(--gold-border);
+  border-radius: 12px; padding: 14px;
+}
+.transfer-title {
+  font-family: monospace; font-size: 11px; letter-spacing: 0.15em;
+  font-weight: 700; color: var(--text-muted); margin-bottom: 10px;
+}
+.transfer-row {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 14px; font-weight: 700; color: var(--text);
+  padding: 7px 0; border-bottom: 1px solid #F5ECC8;
+}
+.transfer-row:last-child { border-bottom: none; }
+.transfer-row .t-amount {
+  margin-left: auto; font-family: monospace; font-size: 16px; color: #C62828;
+}
+.transfer-settled {
+  text-align: center; font-size: 14px; color: #2E7D32;
+  font-weight: 700; padding: 8px;
+}
 </style>
 </head>
 <body>
@@ -315,7 +511,7 @@ body { font-family: var(--font-sans); color: var(--text); background: var(--crea
       <span class="title">BANGKOK</span>
       <span class="sub">城市漫遊 · 手機版</span>
     </div>
-    <a class="ledger-btn" href="https://docs.google.com/spreadsheets/d/1iU_Y2TcAAnNAHc7dZqDDxL65-zGrZEk1dh_Nd1B_qXs/edit?gid=811989658#gid=811989658" target="_blank">💰 記帳</a>
+    <button class="ledger-btn" onclick="openLedger()">🪙 分帳</button>
   </div>
   <div class="day-tabs" id="dayTabs"></div>
 </div>
@@ -644,6 +840,256 @@ function toggleItem(key, color) {
 // Init
 renderPages();
 renderTabs();
+
+// ── EXPENSE SPLITTING ─────────────────────────────
+const MEMBERS = ['湘湘', '子秦', '雅雯'];
+const EXP_KEY = 'bangkok2026-expenses';
+let currentLedgerTab = 'records';
+
+function loadExpenses() {
+  try { return JSON.parse(localStorage.getItem(EXP_KEY) || '[]'); }
+  catch { return []; }
+}
+function saveExpenses(arr) {
+  localStorage.setItem(EXP_KEY, JSON.stringify(arr));
+}
+
+function openLedger() {
+  currentLedgerTab = 'records';
+  document.getElementById('tab-records').classList.add('active');
+  document.getElementById('tab-settle').classList.remove('active');
+  document.getElementById('addBtn').style.display = 'flex';
+  document.getElementById('ledgerOverlay').classList.add('open');
+  renderLedger();
+}
+function closeLedger() {
+  document.getElementById('ledgerOverlay').classList.remove('open');
+}
+function overlayClick(e) {
+  if (e.target === e.currentTarget) closeLedger();
+}
+function switchLedgerTab(tab) {
+  currentLedgerTab = tab;
+  document.getElementById('tab-records').classList.toggle('active', tab === 'records');
+  document.getElementById('tab-settle').classList.toggle('active', tab === 'settle');
+  document.getElementById('addBtn').style.display = tab === 'records' ? 'flex' : 'none';
+  renderLedger();
+}
+function renderLedger() {
+  if (currentLedgerTab === 'records') renderRecords();
+  else renderSettle();
+}
+
+function renderRecords() {
+  const exps = loadExpenses();
+  const body = document.getElementById('ledgerBody');
+  if (exps.length === 0) {
+    body.innerHTML = `<div class="exp-empty">還沒有任何支出紀錄<br>點下方按鈕新增第一筆 ✈️</div>`;
+    return;
+  }
+  const total = exps.reduce((s, e) => s + e.amount, 0);
+  body.innerHTML = `
+    <div style="padding:12px 16px 4px;font-family:monospace;font-size:11px;color:var(--text-muted);letter-spacing:0.08em;">
+      共 ${exps.length} 筆 · 總計 NT$${total.toLocaleString()}
+    </div>
+    <div class="exp-list">${exps.map(e => `
+      <div class="exp-card">
+        <div class="exp-card-info">
+          <div class="exp-name">${e.name}</div>
+          <div class="exp-meta">${e.paidBy} 代墊 · 應攤：${e.splitAmong.join('、')}</div>
+        </div>
+        <span class="exp-amount">NT$&thinsp;${e.amount.toLocaleString()}</span>
+        <button class="exp-del" onclick="deleteExpense(${e.id})">✕</button>
+      </div>
+    `).join('')}</div>`;
+}
+
+function deleteExpense(id) {
+  if (!confirm('確定要刪除這筆支出？')) return;
+  saveExpenses(loadExpenses().filter(e => e.id !== id));
+  renderLedger();
+}
+
+function calcBalances() {
+  const exps = loadExpenses();
+  const paid = {}, owe = {}, items = {};
+  MEMBERS.forEach(m => { paid[m] = 0; owe[m] = 0; items[m] = { paid: [], owe: [] }; });
+  exps.forEach(e => {
+    paid[e.paidBy] += e.amount;
+    items[e.paidBy].paid.push(e);
+    const share = e.amount / e.splitAmong.length;
+    e.splitAmong.forEach(m => {
+      owe[m] += share;
+      items[m].owe.push({ ...e, share });
+    });
+  });
+  return MEMBERS.map(m => ({
+    name: m,
+    paid: paid[m],
+    owe: owe[m],
+    net: Math.round((paid[m] - owe[m]) * 10) / 10,
+    items: items[m]
+  }));
+}
+
+function calcTransfers(balances) {
+  const nets = balances.map(b => ({ name: b.name, net: b.net }));
+  const transfers = [];
+  for (let iter = 0; iter < 10; iter++) {
+    const debtors = nets.filter(n => n.net < -0.5).sort((a, b) => a.net - b.net);
+    const creditors = nets.filter(n => n.net > 0.5).sort((a, b) => b.net - a.net);
+    if (!debtors.length || !creditors.length) break;
+    const d = debtors[0], c = creditors[0];
+    const amt = Math.min(-d.net, c.net);
+    transfers.push({ from: d.name, to: c.name, amount: Math.round(amt) });
+    d.net += amt;
+    c.net -= amt;
+  }
+  return transfers;
+}
+
+function renderSettle() {
+  const balances = calcBalances();
+  const transfers = calcTransfers(balances);
+  const body = document.getElementById('ledgerBody');
+  const cards = balances.map(b => {
+    const netAbs = Math.abs(Math.round(b.net));
+    const netLabel = b.net > 0.5 ? `可收 ${netAbs}` : b.net < -0.5 ? `需付 ${netAbs}` : '已平衡';
+    const netCls = b.net > 0.5 ? 'receive' : b.net < -0.5 ? 'pay' : 'zero';
+    const paidRows = b.items.paid.length
+      ? b.items.paid.map(e => `<div class="settle-row">
+          <span>${e.name}</span>
+          <span class="settle-row-amt" style="color:#1565C0">+NT$${e.amount.toLocaleString()}</span>
+        </div>`).join('')
+      : `<div class="settle-row"><span style="color:#bbb">無代墊項目</span></div>`;
+    const oweRows = b.items.owe.length
+      ? b.items.owe.map(e => `<div class="settle-row">
+          <span>${e.name}</span>
+          <span class="settle-row-amt" style="color:#C62828">-NT$${Math.round(e.share).toLocaleString()}</span>
+        </div>`).join('')
+      : `<div class="settle-row"><span style="color:#bbb">無應攤項目</span></div>`;
+    return `<div class="settle-card" id="sc-${b.name}">
+      <div class="settle-card-head" onclick="toggleSettle('${b.name}')">
+        <span class="settle-name">${b.name}</span>
+        <span class="settle-net ${netCls}">NT$ ${netLabel}</span>
+      </div>
+      <div class="settle-detail">
+        <div class="settle-totals">
+          <div class="settle-total-box">
+            <div class="settle-total-label">代墊總額</div>
+            <div class="settle-total-val" style="color:#1565C0">NT$${b.paid.toLocaleString()}</div>
+          </div>
+          <div class="settle-total-box">
+            <div class="settle-total-label">應攤總額</div>
+            <div class="settle-total-val" style="color:#C62828">NT$${Math.round(b.owe).toLocaleString()}</div>
+          </div>
+        </div>
+        <div class="settle-sub">● 代墊明細</div>${paidRows}
+        <div class="settle-sub">● 應攤明細</div>${oweRows}
+      </div>
+    </div>`;
+  }).join('');
+  const transfersHtml = transfers.length === 0
+    ? `<div class="transfer-settled">✓ 帳已結清，大家互不相欠！</div>`
+    : transfers.map(t => `
+        <div class="transfer-row">
+          <span>${t.from}</span><span>→</span><span>${t.to}</span>
+          <span class="t-amount">NT$&thinsp;${t.amount.toLocaleString()}</span>
+        </div>`).join('');
+  body.innerHTML = `<div class="settle-wrap">${cards}
+    <div class="transfer-section">
+      <div class="transfer-title">最終清算</div>
+      ${transfersHtml}
+    </div>
+  </div>`;
+}
+
+function toggleSettle(name) {
+  document.getElementById(`sc-${name}`).classList.toggle('expanded');
+}
+
+function openExpForm() {
+  document.getElementById('splitChecks').innerHTML = MEMBERS.map(m => `
+    <label class="split-check-label checked" onclick="toggleSplitCheck(this)">
+      <input type="checkbox" value="${m}" checked>${m}
+    </label>`).join('');
+  document.getElementById('fName').value = '';
+  document.getElementById('fAmount').value = '';
+  document.getElementById('fPaidBy').value = MEMBERS[0];
+  document.getElementById('expFormOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('fName').focus(), 300);
+}
+function closeExpForm() {
+  document.getElementById('expFormOverlay').classList.remove('open');
+}
+function toggleSplitCheck(label) {
+  const cb = label.querySelector('input');
+  cb.checked = !cb.checked;
+  label.classList.toggle('checked', cb.checked);
+}
+function confirmAddExp() {
+  const name = document.getElementById('fName').value.trim();
+  const amount = parseInt(document.getElementById('fAmount').value);
+  const paidBy = document.getElementById('fPaidBy').value;
+  const splitAmong = [...document.querySelectorAll('#splitChecks input:checked')].map(cb => cb.value);
+  if (!name) { alert('請填寫名稱'); return; }
+  if (!amount || amount <= 0) { alert('請填寫有效金額'); return; }
+  if (!splitAmong.length) { alert('至少選一位應攤人'); return; }
+  const exps = loadExpenses();
+  exps.push({ id: Date.now(), name, amount, paidBy, splitAmong });
+  saveExpenses(exps);
+  closeExpForm();
+  renderLedger();
+}
 </script>
+
+<!-- LEDGER MODAL -->
+<div class="ledger-overlay" id="ledgerOverlay" onclick="overlayClick(event)">
+  <div class="ledger-sheet">
+    <div class="ledger-header">
+      <span style="font-size:22px;">🪙</span>
+      <span class="ledger-header-title">分帳結算中心</span>
+      <button class="ledger-close" onclick="closeLedger()">✕</button>
+    </div>
+    <div class="ledger-tabs">
+      <button class="ledger-tab active" id="tab-records" onclick="switchLedgerTab('records')">支出紀錄</button>
+      <button class="ledger-tab" id="tab-settle" onclick="switchLedgerTab('settle')">結算</button>
+    </div>
+    <div class="ledger-body" id="ledgerBody"></div>
+    <button class="add-btn" id="addBtn" onclick="openExpForm()">＋ 新增支出</button>
+  </div>
+</div>
+
+<!-- ADD EXPENSE FORM -->
+<div class="exp-form-overlay" id="expFormOverlay">
+  <div class="exp-form-sheet">
+    <div class="exp-form-title">新增支出</div>
+    <div class="form-row">
+      <label class="form-label">名稱 *</label>
+      <input class="form-input" id="fName" type="text" placeholder="例：% Arabica 咖啡">
+    </div>
+    <div class="form-row">
+      <label class="form-label">金額（NT$）*</label>
+      <input class="form-input" id="fAmount" type="number" inputmode="numeric" placeholder="0" min="1">
+    </div>
+    <div class="form-row">
+      <label class="form-label">代墊人</label>
+      <select class="form-select" id="fPaidBy">
+        <option value="湘湘">湘湘</option>
+        <option value="子秦">子秦</option>
+        <option value="雅雯">雅雯</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label class="form-label">應攤人（點擊切換，預設全選）</label>
+      <div class="split-checks" id="splitChecks"></div>
+    </div>
+    <div class="form-btns">
+      <button class="form-btn-cancel" onclick="closeExpForm()">取消</button>
+      <button class="form-btn-ok" onclick="confirmAddExp()">確認新增</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
