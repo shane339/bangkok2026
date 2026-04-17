@@ -915,7 +915,8 @@ function syncFromSheets() {
         const c = row.c;
         const name   = c[8]?.v  || '';
         const paidBy = c[11]?.v || '';
-        const twd    = c[15]?.v;
+        const hasFee = c[15]?.v === true; // P 欄「海外刷卡」
+        const twd    = c[16]?.v;          // Q 欄「台幣總計」（插入海外刷卡欄後移至此）
         const amount = twd ? Math.round(twd) : 0;
         if (name) lastName = name;
         const useName = name || lastName;
@@ -926,7 +927,6 @@ function syncFromSheets() {
         if (c[13]?.v === true) splitAmong.push('子秦');
         if (c[14]?.v === true) splitAmong.push('雅雯');
         if (!splitAmong.length) return;
-        const hasFee = c[16]?.v === true; // Q 欄「海外刷卡」（插入新欄後）
         expenses.push({ id: Date.now() + i, name: useName, amount, paidBy, splitAmong, hasFee });
       });
       if (!expenses.length) { alert('沒有找到可匯入的支出資料'); return; }
