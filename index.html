@@ -499,6 +499,20 @@ body { font-family: var(--font-sans); color: var(--text); background: var(--crea
   text-align: center; font-size: 14px; color: #2E7D32;
   font-weight: 700; padding: 8px;
 }
+.sync-bar {
+  display: flex; align-items: center; justify-content: flex-end;
+  padding: 6px 16px; border-bottom: 1px solid var(--gold-border);
+  flex-shrink: 0;
+}
+.sync-btn {
+  display: flex; align-items: center; gap: 5px;
+  font-family: var(--font-sans); font-size: 12px; font-weight: 700;
+  color: var(--gold-dark); background: var(--gold-light);
+  border: 1.5px solid var(--gold-border); border-radius: 16px;
+  padding: 5px 12px; cursor: pointer;
+}
+.sync-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.sync-btn:active:not(:disabled) { background: var(--gold-border); }
 </style>
 </head>
 <body>
@@ -841,6 +855,69 @@ function toggleItem(key, color) {
 renderPages();
 renderTabs();
 
+// ── GOOGLE SHEETS SYNC ───────────────────────────
+const SHEETS_ID = '1iU_Y2TcAAnNAHc7dZqDDxL65-zGrZEk1dh_Nd1B_qXs';
+const SHEETS_GID = '811989658';
+
+function syncFromSheets() {
+  const btn = document.getElementById('syncBtn');
+  btn.disabled = true;
+  btn.textContent = '同步中...';
+
+  // 攔截 gviz 固定呼叫的 callback（繞過 CORS）
+  window.google = window.google || {};
+  window.google.visualization = window.google.visualization || {};
+  window.google.visualization.Query = window.google.visualization.Query || {};
+  window.google.visualization.Query.setResponse = function(resp) {
+    try {
+      if (resp.status === 'error') throw new Error(resp.errors?.[0]?.message || '資料讀取錯誤');
+      const rows = resp.table.rows;
+      let lastName = '';
+      const expenses = [];
+      rows.forEach((row, i) => {
+        const c = row.c;
+        const name   = c[8]?.v  || '';
+        const paidBy = c[11]?.v || '';
+        const twd    = c[15]?.v;
+        const amount = twd ? Math.round(twd) : 0;
+        if (name) lastName = name;
+        const useName = name || lastName;
+        if (!useName || !paidBy || amount <= 0) return;
+        if (!MEMBERS.includes(paidBy)) return;
+        const splitAmong = [];
+        if (c[12]?.v === true) splitAmong.push('湘湘');
+        if (c[13]?.v === true) splitAmong.push('子秦');
+        if (c[14]?.v === true) splitAmong.push('雅雯');
+        if (!splitAmong.length) return;
+        expenses.push({ id: Date.now() + i, name: useName, amount, paidBy, splitAmong });
+      });
+      if (!expenses.length) { alert('沒有找到可匯入的支出資料'); return; }
+      if (confirm(`從 Google Sheets 找到 ${expenses.length} 筆支出\n確定覆蓋現有資料匯入？`)) {
+        saveExpenses(expenses);
+        renderLedger();
+      }
+    } catch(e) {
+      alert('同步失敗：' + e.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '☁️ 同步 Google Sheets';
+      document.getElementById('sheetsScript')?.remove();
+    }
+  };
+
+  // 移除舊 script 避免快取
+  document.getElementById('sheetsScript')?.remove();
+  const script = document.createElement('script');
+  script.id = 'sheetsScript';
+  script.src = `https://docs.google.com/spreadsheets/d/${SHEETS_ID}/gviz/tq?gid=${SHEETS_GID}&_=${Date.now()}`;
+  script.onerror = () => {
+    alert('無法連線到 Google Sheets，請檢查網路');
+    btn.disabled = false;
+    btn.textContent = '☁️ 同步 Google Sheets';
+  };
+  document.head.appendChild(script);
+}
+
 // ── EXPENSE SPLITTING ─────────────────────────────
 const MEMBERS = ['湘湘', '子秦', '雅雯'];
 const EXP_KEY = 'bangkok2026-expenses';
@@ -1054,6 +1131,9 @@ function confirmAddExp() {
     <div class="ledger-tabs">
       <button class="ledger-tab active" id="tab-records" onclick="switchLedgerTab('records')">支出紀錄</button>
       <button class="ledger-tab" id="tab-settle" onclick="switchLedgerTab('settle')">結算</button>
+    </div>
+    <div class="sync-bar">
+      <button class="sync-btn" id="syncBtn" onclick="syncFromSheets()">☁️ 同步 Google Sheets</button>
     </div>
     <div class="ledger-body" id="ledgerBody"></div>
     <button class="add-btn" id="addBtn" onclick="openExpForm()">＋ 新增支出</button>
