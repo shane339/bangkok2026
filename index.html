@@ -439,6 +439,22 @@ body { font-family: var(--font-sans); color: var(--text); background: var(--crea
   font-family: var(--font-sans);
 }
 .form-btn-ok:active { opacity: 0.85; }
+.currency-tabs { display: flex; gap: 8px; }
+.currency-tab {
+  flex: 1; padding: 10px; text-align: center;
+  border: 1.5px solid var(--gold-border); border-radius: 8px;
+  font-size: 14px; font-weight: 700; cursor: pointer;
+  background: var(--white); color: var(--text-muted);
+  font-family: var(--font-sans);
+}
+.currency-tab.active { background: var(--gold-dark); color: var(--cream); border-color: var(--gold-dark); }
+.thb-section { display: none; }
+.thb-section.show { display: block; }
+.twd-preview {
+  margin-top: 8px; padding: 8px 12px; border-radius: 6px;
+  background: var(--gold-light); font-family: monospace;
+  font-size: 14px; font-weight: 700; color: var(--gold-dark);
+}
 
 /* Settlement view */
 .settle-wrap { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
@@ -1085,6 +1101,21 @@ function toggleSettle(name) {
   document.getElementById(`sc-${name}`).classList.toggle('expanded');
 }
 
+function setCurrency(cur) {
+  document.getElementById('curTWD').classList.toggle('active', cur === 'TWD');
+  document.getElementById('curTHB').classList.toggle('active', cur === 'THB');
+  document.getElementById('amtLabel').textContent = cur === 'TWD' ? '金額（NT$）*' : '金額（THB）*';
+  document.getElementById('thbSection').classList.toggle('show', cur === 'THB');
+  document.getElementById('fAmount').value = '';
+  updateTwdPreview();
+}
+function updateTwdPreview() {
+  if (!document.getElementById('curTHB').classList.contains('active')) return;
+  const amt = parseFloat(document.getElementById('fAmount').value) || 0;
+  const rate = parseFloat(document.getElementById('fRate').value) || 0.9955;
+  const twd = Math.round(amt * rate);
+  document.getElementById('twdPreview').textContent = twd > 0 ? `≈ NT$ ${twd.toLocaleString()}` : '≈ NT$ —';
+}
 function openExpForm() {
   document.getElementById('splitChecks').innerHTML = MEMBERS.map(m => `
     <label class="split-check-label checked" onclick="toggleSplitCheck(this)">
@@ -1093,6 +1124,7 @@ function openExpForm() {
   document.getElementById('fName').value = '';
   document.getElementById('fAmount').value = '';
   document.getElementById('fPaidBy').value = MEMBERS[0];
+  setCurrency('TWD');
   document.getElementById('expFormOverlay').classList.add('open');
   setTimeout(() => document.getElementById('fName').focus(), 300);
 }
@@ -1106,7 +1138,10 @@ function toggleSplitCheck(label) {
 }
 function confirmAddExp() {
   const name = document.getElementById('fName').value.trim();
-  const amount = parseInt(document.getElementById('fAmount').value);
+  const isThb = document.getElementById('curTHB').classList.contains('active');
+  const rawAmt = parseFloat(document.getElementById('fAmount').value);
+  const rate = parseFloat(document.getElementById('fRate').value) || 0.9955;
+  const amount = isThb ? Math.round(rawAmt * rate) : Math.round(rawAmt);
   const paidBy = document.getElementById('fPaidBy').value;
   const splitAmong = [...document.querySelectorAll('#splitChecks input:checked')].map(cb => cb.value);
   if (!name) { alert('請填寫名稱'); return; }
@@ -1149,8 +1184,20 @@ function confirmAddExp() {
       <input class="form-input" id="fName" type="text" placeholder="例：% Arabica 咖啡">
     </div>
     <div class="form-row">
-      <label class="form-label">金額（NT$）*</label>
-      <input class="form-input" id="fAmount" type="number" inputmode="numeric" placeholder="0" min="1">
+      <label class="form-label">幣別</label>
+      <div class="currency-tabs">
+        <button type="button" class="currency-tab active" id="curTWD" onclick="setCurrency('TWD')">NT$ 台幣</button>
+        <button type="button" class="currency-tab" id="curTHB" onclick="setCurrency('THB')">฿ 泰銖</button>
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label" id="amtLabel">金額（NT$）*</label>
+      <input class="form-input" id="fAmount" type="number" inputmode="decimal" placeholder="0" min="1" oninput="updateTwdPreview()">
+    </div>
+    <div class="form-row thb-section" id="thbSection">
+      <label class="form-label">匯率（1 THB = ? TWD）</label>
+      <input class="form-input" id="fRate" type="number" inputmode="decimal" value="0.9955" step="0.0001" oninput="updateTwdPreview()">
+      <div class="twd-preview" id="twdPreview">≈ NT$ —</div>
     </div>
     <div class="form-row">
       <label class="form-label">代墊人</label>
