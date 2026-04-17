@@ -455,6 +455,27 @@ body { font-family: var(--font-sans); color: var(--text); background: var(--crea
   background: var(--gold-light); font-family: monospace;
   font-size: 14px; font-weight: 700; color: var(--gold-dark);
 }
+.fee-toggle {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; border-radius: 8px;
+  border: 1.5px solid var(--gold-border); background: var(--white);
+  cursor: pointer; user-select: none;
+}
+.fee-toggle.on { border-color: var(--gold-dark); background: #FFF8E1; }
+.fee-toggle input { display: none; }
+.fee-toggle-text { flex: 1; font-size: 13px; color: var(--text-muted); }
+.fee-toggle.on .fee-toggle-text { color: var(--gold-dark); font-weight: 700; }
+.fee-dot {
+  width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0;
+  border: 2px solid var(--gold-border); transition: all 0.15s;
+}
+.fee-toggle.on .fee-dot { background: var(--gold-dark); border-color: var(--gold-dark); }
+.fee-preview {
+  display: none; margin-top: 8px; padding: 8px 12px; border-radius: 6px;
+  background: #FFF3CD; font-family: monospace; font-size: 13px;
+  font-weight: 700; color: #856404;
+}
+.fee-preview.show { display: block; }
 
 /* Settlement view */
 .settle-wrap { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
@@ -993,7 +1014,7 @@ function renderRecords() {
       <div class="exp-card">
         <div class="exp-card-info">
           <div class="exp-name">${e.name}</div>
-          <div class="exp-meta">${e.paidBy} 代墊 · 應攤：${e.splitAmong.join('、')}${e.source === 'manual' ? ' · <span style="color:#C8A96E">手動</span>' : ''}</div>
+          <div class="exp-meta">${e.paidBy} 代墊 · 應攤：${e.splitAmong.join('、')}${e.source === 'manual' ? ' · <span style="color:#C8A96E">手動</span>' : ''}${e.hasFee ? ' · <span style="color:#5C85D6">💳+1.5%</span>' : ''}</div>
         </div>
         <span class="exp-amount">NT$&thinsp;${e.amount.toLocaleString()}</span>
         <button class="exp-del" onclick="deleteExpense(${e.id})">✕</button>
@@ -1113,12 +1134,33 @@ function setCurrency(cur) {
   document.getElementById('fAmount').value = '';
   updateTwdPreview();
 }
+function toggleFee() {
+  const cb = document.getElementById('fFee');
+  cb.checked = !cb.checked;
+  document.getElementById('feeToggle').classList.toggle('on', cb.checked);
+  updateTwdPreview();
+}
 function updateTwdPreview() {
-  if (!document.getElementById('curTHB').classList.contains('active')) return;
-  const amt = parseFloat(document.getElementById('fAmount').value) || 0;
-  const rate = parseFloat(document.getElementById('fRate').value) || 0.9955;
-  const twd = Math.round(amt * rate);
-  document.getElementById('twdPreview').textContent = twd > 0 ? `≈ NT$ ${twd.toLocaleString()}` : '≈ NT$ —';
+  const isThb = document.getElementById('curTHB').classList.contains('active');
+  const feeOn = document.getElementById('fFee').checked;
+  const rawAmt = parseFloat(document.getElementById('fAmount').value) || 0;
+  const rate = parseFloat(document.getElementById('fRate')?.value) || 0.9955;
+  const baseTwd = isThb ? rawAmt * rate : rawAmt;
+  const finalAmt = feeOn ? Math.round(baseTwd * 1.015) : Math.round(baseTwd);
+  // THB 換算預覽
+  if (isThb) {
+    const twd = Math.round(baseTwd);
+    document.getElementById('twdPreview').textContent =
+      rawAmt > 0 ? (feeOn ? `≈ NT$ ${twd.toLocaleString()} + 手續費 = NT$ ${finalAmt.toLocaleString()}` : `≈ NT$ ${twd.toLocaleString()}`) : '≈ NT$ —';
+  }
+  // 手續費預覽（TWD 幣別時顯示）
+  const feeEl = document.getElementById('feePreview');
+  if (feeOn && rawAmt > 0 && !isThb) {
+    feeEl.textContent = `含手續費：NT$ ${finalAmt.toLocaleString()}`;
+    feeEl.classList.add('show');
+  } else {
+    feeEl.classList.remove('show');
+  }
 }
 function openExpForm() {
   document.getElementById('splitChecks').innerHTML = MEMBERS.map(m => `
@@ -1129,6 +1171,9 @@ function openExpForm() {
   document.getElementById('fAmount').value = '';
   document.getElementById('fPaidBy').value = MEMBERS[0];
   setCurrency('TWD');
+  document.getElementById('fFee').checked = false;
+  document.getElementById('feeToggle').classList.remove('on');
+  document.getElementById('feePreview').classList.remove('show');
   document.getElementById('expFormOverlay').classList.add('open');
   setTimeout(() => document.getElementById('fName').focus(), 300);
 }
@@ -1143,16 +1188,18 @@ function toggleSplitCheck(label) {
 function confirmAddExp() {
   const name = document.getElementById('fName').value.trim();
   const isThb = document.getElementById('curTHB').classList.contains('active');
+  const feeOn = document.getElementById('fFee').checked;
   const rawAmt = parseFloat(document.getElementById('fAmount').value);
   const rate = parseFloat(document.getElementById('fRate').value) || 0.9955;
-  const amount = isThb ? Math.round(rawAmt * rate) : Math.round(rawAmt);
+  const baseTwd = isThb ? rawAmt * rate : rawAmt;
+  const amount = Math.round(feeOn ? baseTwd * 1.015 : baseTwd);
   const paidBy = document.getElementById('fPaidBy').value;
   const splitAmong = [...document.querySelectorAll('#splitChecks input:checked')].map(cb => cb.value);
   if (!name) { alert('請填寫名稱'); return; }
   if (!amount || amount <= 0) { alert('請填寫有效金額'); return; }
   if (!splitAmong.length) { alert('至少選一位應攤人'); return; }
   const exps = loadExpenses();
-  exps.push({ id: Date.now(), name, amount, paidBy, splitAmong, source: 'manual' });
+  exps.push({ id: Date.now(), name, amount, paidBy, splitAmong, source: 'manual', hasFee: feeOn });
   saveExpenses(exps);
   closeExpForm();
   renderLedger();
@@ -1202,6 +1249,14 @@ function confirmAddExp() {
       <label class="form-label">匯率（1 THB = ? TWD）</label>
       <input class="form-input" id="fRate" type="number" inputmode="decimal" value="0.9955" step="0.0001" oninput="updateTwdPreview()">
       <div class="twd-preview" id="twdPreview">≈ NT$ —</div>
+    </div>
+    <div class="form-row">
+      <label class="fee-toggle" id="feeToggle" onclick="toggleFee()">
+        <input type="checkbox" id="fFee">
+        <span class="fee-toggle-text">💳 海外刷卡手續費（+1.5%）</span>
+        <span class="fee-dot"></span>
+      </label>
+      <div class="fee-preview" id="feePreview"></div>
     </div>
     <div class="form-row">
       <label class="form-label">代墊人</label>
